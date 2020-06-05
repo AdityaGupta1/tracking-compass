@@ -94,8 +94,6 @@ public class ModEventSubscriber {
 
             compassesWithTracking.add(compass);
 
-            System.out.println("added tracking to compass");
-
             compass.addPropertyOverride(new ResourceLocation("angle"), new IItemPropertyGetter() {
                 @OnlyIn(Dist.CLIENT)
                 private double rotation;
@@ -128,9 +126,9 @@ public class ModEventSubscriber {
                             d0 = Math.random();
                         }
 
-                        // if (flag) {
-                        //     d0 = this.wobble(world, d0);
-                        // }
+                        if (flag) {
+                            d0 = this.wobble(world, d0);
+                        }
 
                         return MathHelper.positiveModulo((float) d0, 1.0F);
                     }
