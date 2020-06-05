@@ -1,5 +1,6 @@
 package org.sdoaj.epic;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemFrameEntity;
@@ -10,6 +11,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -54,12 +56,14 @@ public class ModEventSubscriber {
 
         PlayerEntity playerWithCompass = event.getPlayer();
 
-        if (playerWithCompass.world.getDimension().getType().getId() != playerToTrack.world.getDimension().getType().getId()) {
+        if (playerWithCompass.world.getDimension().getType().getId() != 0 || playerToTrack.world.getDimension().getType().getId() != 0) {
             return;
         }
 
         playerCompassPositions.put(playerWithCompass.getUniqueID(), playerToTrack.getPosition());
         compassesWithTracking.clear();
+
+        playerWithCompass.sendStatusMessage(new StringTextComponent(ChatFormatting.RED + "Tracking position updated"), true);
     }
 
     @SubscribeEvent
@@ -94,6 +98,7 @@ public class ModEventSubscriber {
 
             compassesWithTracking.add(compass);
 
+            // mostly yoinked from CompassItem class
             compass.addPropertyOverride(new ResourceLocation("angle"), new IItemPropertyGetter() {
                 @OnlyIn(Dist.CLIENT)
                 private double rotation;
