@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 @Mod.EventBusSubscriber(modid = Main.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModEventSubscriber {
     private static HashMap<UUID, BlockPos> playerCompassPositions = new HashMap<>();
+    private static final ArrayList<CompassItem> compassesWithTracking = new ArrayList<>();
 
     private static final String usernameToTrack = "Dev";
 
@@ -58,6 +59,7 @@ public class ModEventSubscriber {
         }
 
         playerCompassPositions.put(playerWithCompass.getUniqueID(), playerToTrack.getPosition());
+        compassesWithTracking.clear();
     }
 
     @SubscribeEvent
@@ -67,7 +69,6 @@ public class ModEventSubscriber {
         ArrayList<ItemStack> compasses = new ArrayList<>();
         PlayerInventory inventory = player.inventory;
         List<ItemStack> allInventories = Stream.of(inventory.mainInventory, inventory.armorInventory, inventory.offHandInventory).flatMap(NonNullList::stream).collect(Collectors.toList());
-        System.out.println(allInventories);
 
         for (ItemStack stack : allInventories) {
             if (stack.getItem() == Items.COMPASS) {
@@ -86,6 +87,15 @@ public class ModEventSubscriber {
         for (ItemStack stack : compasses) {
             Item item = stack.getItem();
             CompassItem compass = (CompassItem) item;
+
+            if (compassesWithTracking.contains(compass)) {
+                continue;
+            }
+
+            compassesWithTracking.add(compass);
+
+            System.out.println("added tracking to compass");
+
             compass.addPropertyOverride(new ResourceLocation("angle"), new IItemPropertyGetter() {
                 @OnlyIn(Dist.CLIENT)
                 private double rotation;
